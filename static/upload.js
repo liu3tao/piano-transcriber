@@ -107,7 +107,7 @@
         formData.append("onset_threshold", onsetSlider.value);
         formData.append("frame_threshold", frameSlider.value);
         formData.append("min_note_length", noteLenSlider.value);
-        formData.append("abc", document.getElementById("abc-checkbox").checked);
+        formData.append("abc", true);
 
         // Show processing dialog
         submitBtn.disabled = true;

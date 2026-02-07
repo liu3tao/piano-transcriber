@@ -29,6 +29,7 @@
 
     const midiDownload = document.getElementById("midi-download");
     const abcDownload = document.getElementById("abc-download");
+    const sheetSection = document.getElementById("sheet-section");
 
     // --- State ---
     let synth = null;
@@ -48,6 +49,80 @@
         loadingText.hidden = true;
         errorMessage.textContent = message;
         errorBox.hidden = false;
+    }
+
+    // --- ABC synth player (note-highlighting visual widget) ---
+    function CursorControl() {
+        this.onStart = function () {
+            var svg = document.querySelector("#sheet-music svg");
+            if (!svg) return;
+            var cursor = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            cursor.setAttribute("class", "abcjs-cursor");
+            cursor.setAttributeNS(null, "x1", 0);
+            cursor.setAttributeNS(null, "y1", 0);
+            cursor.setAttributeNS(null, "x2", 0);
+            cursor.setAttributeNS(null, "y2", 0);
+            svg.appendChild(cursor);
+        };
+
+        this.onEvent = function (ev) {
+            // Remove previous highlights
+            var lastSelection = document.querySelectorAll("#sheet-music svg .abcjs-highlight");
+            for (var k = 0; k < lastSelection.length; k++) {
+                lastSelection[k].classList.remove("abcjs-highlight");
+            }
+
+            // Highlight current notes
+            for (var i = 0; i < ev.elements.length; i++) {
+                var note = ev.elements[i];
+                for (var j = 0; j < note.length; j++) {
+                    note[j].classList.add("abcjs-highlight");
+                }
+            }
+
+            // Move cursor line
+            var cursor = document.querySelector("#sheet-music svg .abcjs-cursor");
+            if (cursor) {
+                cursor.setAttribute("x1", ev.left - 2);
+                cursor.setAttribute("x2", ev.left - 2);
+                cursor.setAttribute("y1", ev.top);
+                cursor.setAttribute("y2", ev.top + ev.height);
+            }
+        };
+
+        this.onFinished = function () {
+            var els = document.querySelectorAll("#sheet-music svg .abcjs-highlight");
+            for (var i = 0; i < els.length; i++) {
+                els[i].classList.remove("abcjs-highlight");
+            }
+            var cursor = document.querySelector("#sheet-music svg .abcjs-cursor");
+            if (cursor) {
+                cursor.setAttribute("x1", 0);
+                cursor.setAttribute("x2", 0);
+                cursor.setAttribute("y1", 0);
+                cursor.setAttribute("y2", 0);
+            }
+        };
+    }
+
+    function initAbcPlayer(visualObj) {
+        var abcSynthControl = new ABCJS.synth.SynthController();
+        abcSynthControl.load("#abc-player", new CursorControl(), {
+            displayPlay: true,
+            displayProgress: true,
+            displayRestart: true,
+        });
+
+        var midiBuffer = new ABCJS.synth.CreateSynth();
+        midiBuffer.init({ visualObj: visualObj }).then(function () {
+            abcSynthControl.setTune(visualObj, false).then(function () {
+                console.log("ABC audio player loaded.");
+            }).catch(function (error) {
+                console.warn("ABC audio problem:", error);
+            });
+        }).catch(function (error) {
+            console.warn("ABC synth init problem:", error);
+        });
     }
 
     // --- Load job data ---
@@ -88,6 +163,29 @@
                 abcDownload.href = meta.abc_url;
                 abcDownload.download = `${jobId}.abc`;
                 abcDownload.hidden = false;
+
+                // Fetch ABC text, render sheet music, and set up synth player
+                try {
+                    const abcResp = await fetch(meta.abc_url);
+                    if (abcResp.ok) {
+                        const abcText = await abcResp.text();
+                        const visualObj = ABCJS.renderAbc("sheet-music", abcText, {
+                            responsive: "resize",
+                            staffwidth: 800,
+                            add_classes: true,
+                        })[0];
+
+                        // Initialize the abcjs synth player widget
+                        if (ABCJS.synth.supportsAudio()) {
+                            initAbcPlayer(visualObj);
+                        }
+
+                        sheetSection.hidden = false;
+                    }
+                } catch (e) {
+                    // Sheet music rendering is best-effort; don't block the page
+                    console.warn("Failed to render sheet music:", e);
+                }
             }
 
             // Load MIDI for playback

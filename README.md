@@ -122,13 +122,45 @@ piano_transcriber/
 
 ## Architecture Notes
 
+### MIDI-to-ABC Conversion
+
+ABC notation is a text-based music notation format that can be rendered as
+sheet music in the browser (via [abcjs](https://www.abcjs.net/)) and is
+human-readable. Converting MIDI to ABC is non-trivial because MIDI stores
+note events as raw timestamps in seconds, while ABC requires notes expressed
+as standard rhythmic values (quarter notes, eighth notes, etc.).
+
+**Why we built a custom converter instead of using music21's ABC writer:**
+
+music21 can export to ABC via `score.write('abc')`, but its output is
+unreliable for polyphonic piano transcriptions. It produces complex fractional
+durations (e.g. `27/8`, `11/2`) that abcjs's parser reads incorrectly --
+the parser greedily consumes digits, so `^C,,27/8` gets split into
+pitch `^C,,` with duration `2`, followed by orphan token `7/8`, which
+renders as "pitch is undefined" errors.
+
+**How the custom converter works** (`abc_converter.py`):
+
+1. Reads the MIDI file with `pretty_midi`
+2. Estimates tempo from the MIDI metadata
+3. Converts note onset times and durations from seconds to eighth-note units
+4. Snaps every duration to a standard musical value (1, 2, 3, 4, 6, 8, 12,
+   16, 24, or 32 eighth notes) -- this guarantees all durations are simple
+   single-token integers that abcjs parses unambiguously
+5. Groups simultaneous notes into ABC chords (`[CEG]`)
+6. Inserts rests (also snapped to standard values) for gaps between notes
+7. Adds barlines every 8 eighth notes (4/4 time)
+
+The result is clean, parser-safe ABC that renders reliably in abcjs with
+synchronized note highlighting during playback.
+
 ### Quantization Strategy
 
-The ABC converter uses a pluggable `QuantizationStrategy` abstraction. The
-default strategy uses music21's built-in quantizer. A `ReferenceGuidedQuantization`
-class is stubbed out for future use -- it would accept a reference music score
-(MusicXML, MIDI, ABC, etc.) to guide quantization, improving output quality for
-pieces with rubato or complex rhythms.
+The ABC converter exposes a pluggable `QuantizationStrategy` abstraction.
+A `ReferenceGuidedQuantization` class is stubbed out for future use -- it
+would accept a reference music score (MusicXML, MIDI, ABC, etc.) to guide
+quantization, improving output quality for pieces with rubato or complex
+rhythms.
 
 ## License
 
