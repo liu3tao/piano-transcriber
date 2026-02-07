@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano Note Recognizer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>Piano Note Recognizer</h1>
+            <p>Upload a piano recording and transcribe it to MIDI. Supports
+               <strong>.wav</strong>, <strong>.mp3</strong>, <strong>.ogg</strong>,
+               <strong>.flac</strong>, and <strong>.webm</strong> formats.</p>
+        </header>
+
+        <!-- Upload form -->
+        <form id="upload-form">
+            <fieldset>
+                <legend>Audio File</legend>
+
+                <!-- Drop zone -->
+                <div id="drop-zone" class="drop-zone">
+                    <p>Drag &amp; drop an audio file here, or click to browse</p>
+                    <input type="file" id="file-input" name="file"
+                           accept=".wav,.mp3,.ogg,.flac,.webm" hidden>
+                </div>
+                <p id="file-name" class="file-name-display"></p>
+            </fieldset>
+
+            <fieldset>
+                <legend>Transcription Parameters</legend>
+
+                <label for="onset-threshold">
+                    Onset Threshold:
+                    <span id="onset-value" class="slider-value">0.5</span>
+                </label>
+                <input type="range" id="onset-threshold" name="onset_threshold"
+                       min="0.1" max="0.9" step="0.05" value="0.5">
+
+                <label for="frame-threshold">
+                    Frame Threshold:
+                    <span id="frame-value" class="slider-value">0.3</span>
+                </label>
+                <input type="range" id="frame-threshold" name="frame_threshold"
+                       min="0.1" max="0.9" step="0.05" value="0.3">
+
+                <label for="min-note-length">
+                    Min Note Length (ms):
+                    <span id="note-len-value" class="slider-value">58</span>
+                </label>
+                <input type="range" id="min-note-length" name="min_note_length"
+                       min="10" max="200" step="1" value="58">
+
+                <label>
+                    <input type="checkbox" id="abc-checkbox" name="abc" role="switch">
+                    Also generate ABC notation
+                </label>
+            </fieldset>
+
+            <button type="submit" id="submit-btn">Transcribe</button>
+        </form>
+
+        <!-- Processing overlay -->
+        <dialog id="processing-dialog">
+            <article>
+                <h3>Transcribing...</h3>
+                <p>This may take a moment depending on the length of the recording.</p>
+                <progress></progress>
+            </article>
+        </dialog>
+
+        <!-- Error display -->
+        <div id="error-box" class="error-box" hidden>
+            <p id="error-message"></p>
+        </div>
+    </main>
+
+    <script src="/upload.js"></script>
+</body>
+</html>

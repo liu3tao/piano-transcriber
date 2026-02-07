@@ -2,3 +2,6 @@ basic-pitch[tf]
 pretty_midi
 music21
 pydub
+fastapi
+uvicorn[standard]
+python-multipart

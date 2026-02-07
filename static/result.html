@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcription Result - Piano Note Recognizer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>Transcription Result</h1>
+            <p id="loading-text">Loading results...</p>
+        </header>
+
+        <!-- Summary section -->
+        <section id="summary-section" hidden>
+            <h2>Summary</h2>
+            <div class="grid">
+                <div class="summary-card">
+                    <strong>Notes Detected</strong>
+                    <span id="num-notes">--</span>
+                </div>
+                <div class="summary-card">
+                    <strong>Duration</strong>
+                    <span id="duration">--</span>
+                </div>
+                <div class="summary-card">
+                    <strong>Pitch Range</strong>
+                    <span id="pitch-range">--</span>
+                </div>
+                <div class="summary-card">
+                    <strong>Time Span</strong>
+                    <span id="time-span">--</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Player section -->
+        <section id="player-section" hidden>
+            <h2>MIDI Player</h2>
+            <div class="player-controls">
+                <button id="play-btn" class="outline">Play</button>
+                <button id="pause-btn" class="outline" disabled>Pause</button>
+                <button id="stop-btn" class="outline" disabled>Stop</button>
+                <span id="playback-time" class="playback-time">0:00</span>
+            </div>
+            <progress id="playback-progress" value="0" max="100"></progress>
+        </section>
+
+        <!-- Downloads section -->
+        <section id="downloads-section" hidden>
+            <h2>Downloads</h2>
+            <div class="download-links">
+                <a id="midi-download" href="#" role="button">Download MIDI</a>
+                <a id="abc-download" href="#" role="button" class="outline" hidden>Download ABC</a>
+            </div>
+        </section>
+
+        <!-- Error display -->
+        <div id="error-box" class="error-box" hidden>
+            <p id="error-message"></p>
+        </div>
+
+        <hr>
+        <a href="/">Transcribe another recording</a>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/tone@14/build/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2/build/Midi.js"></script>
+    <script src="/player.js"></script>
+</body>
+</html>

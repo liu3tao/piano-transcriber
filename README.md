@@ -1,14 +1,15 @@
 # Piano Note Recognizer
 
-A CLI tool that transcribes piano audio recordings into MIDI files and optionally ABC notation for music-sheet rendering. Powered by Spotify's [basic-pitch](https://github.com/spotify/basic-pitch) neural network for polyphonic note detection.
+Transcribes piano audio recordings into MIDI files and optionally ABC notation for music-sheet rendering. Powered by Spotify's [basic-pitch](https://github.com/spotify/basic-pitch) neural network for polyphonic note detection. Available as both a **CLI tool** and a **local web app** with in-browser MIDI playback.
 
 ## Features
 
-- Reads `.wav`, `.mp3`, `.ogg`, and `.flac` audio files
+- Reads `.wav`, `.mp3`, `.ogg`, `.flac`, and `.webm` audio files
 - Detects polyphonic piano notes (chords, arpeggios, complex passages)
 - Outputs standard `.mid` (MIDI) files
 - Optionally exports ABC notation (`.abc`) for sheet-music rendering
 - Configurable detection thresholds for tuning accuracy vs. sensitivity
+- **Web UI** with drag-and-drop upload, parameter tuning, and in-browser MIDI playback
 
 ## Installation
 
@@ -23,26 +24,44 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Basic: audio to MIDI
+### Web UI
+
+Start the local web server:
+
+```bash
+python server.py
+```
+
+Then open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser. You can:
+
+1. Upload an audio file (drag-and-drop or click to browse)
+2. Adjust transcription parameters with sliders
+3. Hit "Transcribe" and wait for the result
+4. Play back the MIDI directly in the browser
+5. Download the generated MIDI (and optionally ABC) files
+
+### CLI
+
+#### Basic: audio to MIDI
 
 ```bash
 python main.py recording.wav
 # -> produces recording.mid
 ```
 
-### Specify output path
+#### Specify output path
 
 ```bash
 python main.py recording.mp3 -o my_transcription.mid
 ```
 
-### With ABC notation output
+#### With ABC notation output
 
 ```bash
 python main.py recording.wav -o output.mid --abc output.abc
 ```
 
-### Full options
+#### Full options
 
 ```
 usage: piano-transcriber [-h] [-o OUTPUT] [--abc ABC_PATH]
@@ -84,11 +103,21 @@ The three transcription parameters let you trade off between sensitivity and pre
 
 ```
 piano_transcriber/
-├── main.py            # CLI entry point
-├── transcriber.py     # Audio-to-MIDI using basic-pitch
-├── abc_converter.py   # MIDI-to-ABC with pluggable quantization
-├── requirements.txt   # Python dependencies
-└── README.md          # This file
+├── main.py              # CLI entry point
+├── server.py            # FastAPI web server
+├── transcriber.py       # Core audio-to-MIDI transcription
+├── abc_converter.py     # MIDI-to-ABC with pluggable quantization
+├── file_manager.py      # Upload/output file lifecycle management
+├── static/
+│   ├── index.html       # Upload page
+│   ├── result.html      # Results + MIDI player page
+│   ├── upload.js        # Upload form logic
+│   ├── player.js        # MIDI playback with Tone.js
+│   └── style.css        # Shared styles
+├── uploads/             # Temporary uploaded audio (auto-cleaned)
+├── outputs/             # Generated MIDI/ABC files (auto-cleaned)
+├── requirements.txt     # Python dependencies
+└── README.md            # This file
 ```
 
 ## Architecture Notes

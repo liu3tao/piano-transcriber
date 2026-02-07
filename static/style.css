@@ -1,0 +1,119 @@
+/* style.css -- Shared styles for the Piano Note Recognizer web UI.
+   Pico CSS handles most of the heavy lifting; these are additions. */
+
+/* --- Drop zone --- */
+.drop-zone {
+    border: 2px dashed var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+    border-color: var(--pico-primary);
+    background-color: var(--pico-primary-focus);
+}
+
+.drop-zone.has-file {
+    border-color: var(--pico-primary);
+    border-style: solid;
+}
+
+.drop-zone p {
+    margin: 0;
+    color: var(--pico-muted-color);
+}
+
+.file-name-display {
+    font-size: 0.9rem;
+    color: var(--pico-primary);
+    margin-top: 0.5rem;
+    min-height: 1.4em;
+}
+
+/* --- Slider value display --- */
+.slider-value {
+    float: right;
+    font-weight: bold;
+    color: var(--pico-primary);
+}
+
+/* --- Summary cards --- */
+.summary-card {
+    text-align: center;
+    padding: 1rem;
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
+}
+
+.summary-card strong {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--pico-muted-color);
+    margin-bottom: 0.25rem;
+}
+
+.summary-card span {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+/* --- Player controls --- */
+.player-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.player-controls button {
+    margin-bottom: 0;
+    width: auto;
+}
+
+.playback-time {
+    font-family: monospace;
+    font-size: 1.1rem;
+    margin-left: auto;
+}
+
+#playback-progress {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Download links --- */
+.download-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.download-links a[role="button"] {
+    text-decoration: none;
+}
+
+/* --- Error box --- */
+.error-box {
+    background-color: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: var(--pico-border-radius);
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.error-box p {
+    margin: 0;
+    color: #b91c1c;
+}
+
+/* --- Processing dialog --- */
+dialog article {
+    text-align: center;
+}
+
+dialog progress {
+    margin-top: 1rem;
+}
